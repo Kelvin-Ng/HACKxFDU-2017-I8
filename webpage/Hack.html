@@ -1,0 +1,124 @@
+
+<html>
+	<head>
+		<title>My first three.js app</title>
+		<style>
+*{ margin: 0; }
+#container { 
+	width: 400px;
+	height: 400px;
+	background-color:#2e2e2e; }
+		</style>
+	</head>
+	<body>
+		<div>
+			<h3>Simulation of Wall Installation ~~~ <br /><br /></h3>
+
+			<div id="container"></div>
+		</div>
+
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r70/three.min.js"> </script>
+		<script>
+
+var res_lines;
+var cur_line_id = 0;
+var animate_interval;
+
+//readTextFile('file:///data/kelvin/Programming/HACKxFDU2017/component-installation-data-fake/res.txt');
+readTextFile('http://127.0.0.1/hackxfdu/res.txt');
+
+function onLoad() {
+
+	var container = document.getElementById("container");
+	var renderer = new THREE.WebGLRenderer();
+	renderer.setSize(container.offsetWidth, container.offsetHeight);
+	container.appendChild(renderer.domElement);
+	/*
+	 * Create a THREE.js Scene
+	 */
+	var scene = new THREE.Scene();
+	/*
+	 * Create a Perspective camera and add it to the Scene
+	 */
+	var camera = new THREE.PerspectiveCamera(45, container.offsetWidth / container.offsetHeight, 1, 4000);
+	camera.position.set(0, 0, 5); // Coordinates of Center
+	scene.add(camera);
+	/*
+	 * Create a Rectangle 
+	 */
+	var geometry = new THREE.PlaneGeometry(2, 0.5);
+	var material = new THREE.MeshBasicMaterial({
+		color: 0xDB1E1E,
+		//wireframe: true
+	});
+	var mesh = new THREE.Mesh(geometry, material);
+	scene.add(mesh);
+
+	/*Create a Circle 1 */
+	var geometry = new THREE.CircleGeometry( 0.1, 50 );
+	var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+	var circle1 = new THREE.Mesh( geometry, material );
+	scene.add( circle1 );
+
+	/*Create a Circle 2 */
+	var geometry = new THREE.CircleGeometry( 0.1, 50 );
+	var material = new THREE.MeshBasicMaterial( { color: 0xfffff0} );
+	var circle2 = new THREE.Mesh( geometry, material );
+	scene.add( circle2 );
+
+	/*Create a Circle 3 */
+	var geometry = new THREE.CircleGeometry( 0.1, 50 );
+	var material = new THREE.MeshBasicMaterial( { color: 0xabcede0 } );
+	var circle3 = new THREE.Mesh( geometry, material );
+	scene.add( circle3 );
+
+	var animate = function() {
+		if (cur_line_id >= res_lines.length) {
+			clearInterval(animate_interval);
+			return;
+		}
+
+		var cur_line = res_lines[cur_line_id].split(',');
+
+		mesh.position.x = cur_line[0];
+		mesh.position.y = cur_line[1];
+		mesh.rotation.z = cur_line[2];
+
+		circle1.position.x=cur_line[0];
+		circle1.position.y=cur_line[1];
+		circle2.position.x=cur_line[3];
+		circle2.position.y=cur_line[4];
+		circle3.position.x=cur_line[5];
+		circle3.position.y=cur_line[6];
+
+		cur_line_id++;
+
+		renderer.render(scene, camera);
+	};
+	animate_interval = setInterval(animate, 100);
+}
+
+function readTextFile(file)
+{
+	var rawFile = new XMLHttpRequest();
+	rawFile.onreadystatechange = function ()
+	{
+		if(rawFile.readyState === 4)
+		{
+			if(rawFile.status === 200 || rawFile.status == 0)
+			{
+				var allText = rawFile.responseText;
+				res_lines = allText.split('\n');
+				onLoad();
+			}
+		}
+	}
+	rawFile.open("GET", file, true);
+	rawFile.send();
+}
+
+		</script>
+
+	</body>
+</html>
